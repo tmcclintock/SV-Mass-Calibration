@@ -56,17 +56,31 @@ if do_hhcf:
 
 if do_jk:
     ndivs = 8
+    njk   = ndivs*ndivs*ndivs
     step  = boxsize/ndivs
-    for i in range(len(indices)):
+    for i in range(1):#len(indices)):
         ind = indices[i]
         red = redshifts[i]
         cmap = plt.get_cmap(cmaps[i])
-        for j in range(len(lM_edges)-1):
+        for j in range(1):#len(lM_edges)-1):
             if do_jkcalc:
                 data = np.genfromtxt(halopath%(j,red))
                 if not data.size: continue
-                x,y,z,N,M,lam = data.T
-                #Now need split the data into little sub boxes
+                x,y,z,Np,M,lam = data.T
+                Nh = len(M)/njk #average number of halos per JK subregion
+                Nr = Nh*20
+                xi = x/step
+                yi = y/step
+                zi = z/step
+                xi = xi.astype(int)
+                yi = yi.astype(int)
+                zi = zi.astype(int)
+                #jkinds now contains the indices for each halo for which box it's in
+                jkinds = zi*ndivs*ndivs + yi*ndivs + xi
+                for jk in range(njk): #Do autocorrelations
+                    xr = step*np.random.uniform(jk%ndivs, jk%ndivs+1, Nr)
+                    yr = step*np.random.uniform(jk/ndivs, jk/ndivs+1, Nr)
+                    zr = step*np.random.uniform(jk/ndivs**2, jk/ndivs**2+1, Nr)
                 #Then do auto correlations
                 #Then do cross correlations
                 #Then resum to get the totals
